@@ -34,7 +34,7 @@ using (IHost host = hostBuilder.Build())
     using (var scope = host.Services.CreateScope())
     {
         // Запускаем нашу программку...
-        var app = ActivatorUtilities.GetServiceOrCreateInstance<IMyApp>(host.Services);
+        var app = ActivatorUtilities.GetServiceOrCreateInstance<IMyApp>(scope.ServiceProvider);
         await app.Run();
     }
 }
