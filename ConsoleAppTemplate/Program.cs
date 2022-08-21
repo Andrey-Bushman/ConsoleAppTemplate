@@ -17,11 +17,13 @@ hostBuilder.ConfigureServices((context, services) =>
 {
     // Регистрируем наше приложение, чтобы можно было ему при создании подтянуть инфу из DI.
     services.AddSingleton<IMyApp, MyApp>();
-    // Команды и запросы могут быть определены в одной сборке, а их обработчики - в другой.
-    // Поэтому у нас в конфиге две настройки, у которых в качестве значений - имена сборок,
-    // разделённые символом ';'.
-    var commandAssemblyNames = context.Configuration.GetValue<string>("MediatR:CommandAssemblies").Split(';');
-    var handlerAssemblyNames = context.Configuration.GetValue<string>("MediatR:HandlerAssemblies").Split(';');
+
+    // Команды и запросы могут быть определены в одних сборках, а их обработчики - в других.
+    // По этой причине у нас в конфиге мы создали две настройки: одна содержит
+    // массив имён сборок, в которых определены CQRS команды и запросы, а другая - имена сборок,
+    // содержащих обработчики этих команд и запросов.
+    var commandAssemblyNames = context.Configuration.GetSection("MediatR:CommandAssemblies").Get<string[]>();
+    var handlerAssemblyNames = context.Configuration.GetSection("MediatR:HandlerAssemblies").Get<string[]>();
     var names = commandAssemblyNames.Union(handlerAssemblyNames).Distinct();
 
     var assemblies = names.Select(n => Assembly.Load(n)).ToArray();
